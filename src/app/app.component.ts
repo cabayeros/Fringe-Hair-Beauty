@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnDestroy, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit, inject } from '@angular/core';
 
 type Section = 'inicio' | 'acerca' | 'beneficios' | 'politicas' | 'establecimientos' | 'cuenta' | 'contacto';
 
@@ -61,7 +61,7 @@ type Section = 'inicio' | 'acerca' | 'beneficios' | 'politicas' | 'establecimien
             <button class="slide-control next" type="button" aria-label="Imagen siguiente" (click)="moveSlide(1)">›</button>
             <div class="slide-dots">
               @for (image of slides; track image; let i = $index) {
-                <button type="button" [class.selected]="slide === i" [attr.aria-label]="'Ver imagen ' + (i + 1)" (click)="slide = i"></button>
+                <button type="button" [class.selected]="slide === i" [attr.aria-label]="'Ver imagen ' + (i + 1)" (click)="selectSlide(i)"></button>
               }
             </div>
           </div>
@@ -205,7 +205,7 @@ type Section = 'inicio' | 'acerca' | 'beneficios' | 'politicas' | 'establecimien
     </main>
   `,
 })
-export class AppComponent implements OnDestroy {
+export class AppComponent implements OnInit, OnDestroy {
   readonly navItems: { id: Section; label: string }[] = [
     { id: 'inicio', label: 'INICIO' }, { id: 'acerca', label: 'ACERCA DE' },
     { id: 'beneficios', label: 'BENEFICIOS' }, { id: 'politicas', label: 'POLÍTICAS' },
@@ -220,9 +220,19 @@ export class AppComponent implements OnDestroy {
   loginMessage = '';
   contactMessage = '';
   private controlsTimer: ReturnType<typeof setTimeout> | undefined;
+  private slideTimer: ReturnType<typeof setInterval> | undefined;
+
+  ngOnInit(): void {
+    this.startSlideRotation();
+  }
 
   navigate(section: Section): void {
     this.section = section;
+    if (section === 'inicio') {
+      this.startSlideRotation();
+    } else {
+      this.stopSlideRotation();
+    }
     this.loginMessage = '';
     this.contactMessage = '';
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -230,6 +240,26 @@ export class AppComponent implements OnDestroy {
 
   moveSlide(direction: number): void {
     this.slide = (this.slide + direction + this.slides.length) % this.slides.length;
+    this.startSlideRotation();
+  }
+
+  selectSlide(index: number): void {
+    this.slide = index;
+    this.startSlideRotation();
+  }
+
+  private startSlideRotation(): void {
+    this.stopSlideRotation();
+    if (this.section !== 'inicio') return;
+    this.slideTimer = setInterval(() => {
+      this.slide = (this.slide + 1) % this.slides.length;
+      this.changeDetector.markForCheck();
+    }, 5000);
+  }
+
+  private stopSlideRotation(): void {
+    if (this.slideTimer) clearInterval(this.slideTimer);
+    this.slideTimer = undefined;
   }
 
   showControls(): void {
@@ -250,6 +280,7 @@ export class AppComponent implements OnDestroy {
 
   ngOnDestroy(): void {
     if (this.controlsTimer) clearTimeout(this.controlsTimer);
+    this.stopSlideRotation();
   }
 
   submitLogin(): void {
