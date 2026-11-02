@@ -17,10 +17,36 @@ type Section = 'inicio' | 'acerca' | 'beneficios' | 'politicas' | 'establecimien
         </a>
       </header>
       <nav class="main-nav" aria-label="Navegación principal">
-        <button class="menu-toggle" type="button" (click)="menuOpen = !menuOpen" [attr.aria-expanded]="menuOpen">☰ <span>Menú</span></button>
-        <div class="nav-links" [class.open]="menuOpen">
+        <div class="nav-links">
           @for (item of navItems; track item.id) {
-            <button type="button" [class.active]="section === item.id" (click)="navigate(item.id)">{{ item.label }}</button>
+            <button type="button" [class.active]="section === item.id" [attr.aria-label]="item.label" [title]="item.label" (click)="navigate(item.id)">
+              <span class="nav-icon" aria-hidden="true">
+                @switch (item.id) {
+                  @case ('inicio') {
+                    <svg viewBox="0 0 24 24"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z" /></svg>
+                  }
+                  @case ('acerca') {
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" /><path d="M12 11v5m0-8h.01" /></svg>
+                  }
+                  @case ('beneficios') {
+                    <svg viewBox="0 0 24 24"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2-5.6-3-5.6 3 1.1-6.2L3 9.6l6.2-.9z" /></svg>
+                  }
+                  @case ('politicas') {
+                    <svg viewBox="0 0 24 24"><path d="M6 3h9l4 4v14H6z" /><path d="M14 3v5h5m-9 4h5m-5 4h5" /></svg>
+                  }
+                  @case ('establecimientos') {
+                    <svg viewBox="0 0 24 24"><path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z" /><circle cx="12" cy="10" r="2.5" /></svg>
+                  }
+                  @case ('cuenta') {
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4" /><path d="M4 21a8 8 0 0 1 16 0" /></svg>
+                  }
+                  @case ('contacto') {
+                    <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2" /><path d="m3 7 9 6 9-6" /></svg>
+                  }
+                }
+              </span>
+              <span class="nav-label">{{ item.label }}</span>
+            </button>
           }
         </div>
       </nav>
@@ -189,7 +215,6 @@ export class AppComponent implements OnDestroy {
   readonly slides = ['assets/img/slider/SLIDE4.png', 'assets/img/slider/SLIDE2.png', 'assets/img/slider/SLIDE3.png', 'assets/img/slider/SLIDE1.png'];
   section: Section = 'inicio';
   slide = 0;
-  menuOpen = false;
   controlsVisible = false;
   private readonly changeDetector = inject(ChangeDetectorRef);
   loginMessage = '';
@@ -198,7 +223,6 @@ export class AppComponent implements OnDestroy {
 
   navigate(section: Section): void {
     this.section = section;
-    this.menuOpen = false;
     this.loginMessage = '';
     this.contactMessage = '';
     window.scrollTo({ top: 0, behavior: 'smooth' });

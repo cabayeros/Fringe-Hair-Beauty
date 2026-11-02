@@ -400,6 +400,10 @@ body {
   padding: 7px clamp(10px, 2vw, 28px);
 }
 
+.nav-icon {
+  display: none;
+}
+
 .nav-links button {
   height: 42px;
   border: 1px solid transparent;
@@ -640,7 +644,7 @@ body {
   background: #302f2b;
 }
 
-@media (max-width: 700px) {
+@media (max-width: 800px) {
   .hero {
     margin: 18px auto 26px;
   }
@@ -719,7 +723,7 @@ body {
   }
 }
 
-@media (max-width: 700px) {
+@media (max-width: 800px) {
   .brand-row {
     height: 112px;
   }
@@ -772,5 +776,95 @@ body {
 
   .policy-content {
     padding: 16px 20px;
+  }
+}
+
+@media (max-width: 800px) {
+  .site-shell {
+    padding-bottom: calc(82px + env(safe-area-inset-bottom));
+  }
+
+  .main-nav {
+    position: fixed;
+    z-index: 20;
+    right: 8px;
+    bottom: calc(10px + env(safe-area-inset-bottom));
+    left: 8px;
+    width: auto;
+    border: 0;
+    border-radius: 22px;
+    background: rgb(255 255 255 / 94%);
+    box-shadow: 0 8px 30px rgb(42 38 25 / 16%), 0 1px 4px rgb(42 38 25 / 8%);
+    backdrop-filter: blur(16px);
+  }
+
+  .menu-toggle {
+    display: none;
+  }
+
+  .nav-links {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    width: 100%;
+    gap: 1px;
+    padding: 4px;
+    border: 1px solid rgb(233 230 220 / 80%);
+    border-radius: inherit;
+    overflow: hidden;
+    scrollbar-width: none;
+  }
+
+  .nav-links::-webkit-scrollbar {
+    display: none;
+  }
+
+  .nav-links button {
+    display: flex;
+    min-width: 0;
+    min-height: 48px;
+    height: 48px;
+    flex: 1 1 0;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 0;
+    border-radius: 15px;
+    background: transparent;
+    color: #77746b;
+    transition: background-color 160ms ease, color 160ms ease, transform 160ms ease;
+  }
+
+  .nav-links button.active,
+  .nav-links button:nth-child(even).active {
+    background: #fff5bd;
+    box-shadow: none;
+    color: #373630 !important;
+  }
+
+  .nav-links button:active {
+    transform: scale(.92);
+  }
+
+  .nav-icon {
+    display: grid;
+    width: 22px;
+    height: 22px;
+    place-items: center;
+  }
+
+  .nav-icon svg {
+    display: block;
+    width: 20px;
+    height: 20px;
+    fill: none;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 1.8;
+  }
+
+  .nav-label {
+    display: none;
   }
 }
