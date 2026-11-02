@@ -199,7 +199,7 @@ type Section = 'inicio' | 'acerca' | 'beneficios' | 'politicas' | 'establecimien
         </section>
       }
       <footer class="footer">
-        <div class="footer-brand"><img src="assets/img/logo/logo_fringe_footer.jpg" alt="Fringe"><span>Todos los derechos reservados</span></div>
+        <div class="footer-brand"><img src="assets/img/logo/logo_fringe_footer.png" alt="Fringe"><span>Todos los derechos reservados</span></div>
         <img class="datacode" src="assets/img/DATACODE.png" alt="Datacode">
       </footer>
     </main>
