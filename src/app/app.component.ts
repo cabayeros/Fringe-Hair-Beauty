@@ -79,7 +79,7 @@ type Section = 'inicio' | 'acerca' | 'beneficios' | 'politicas' | 'establecimien
               <div class="panel-heading"><h1>ACERCA DE</h1></div>
               <article class="about-content">
                 <h2>“Fringe Experience”</h2>
-                <p>¡Bienvenida a Fringe Rewards! Un programa hecho para ti, que siempre confías en nosotras para verte y sentirte espectacular. Acumula puntos cada vez que nos visitas y transforma tu Fringe Experiencia en Q´s, descuentos y más momentos Fringe.</p>
+                <p>¡Bienvenida a Fringe Rewards! Un programa hecho para ti, que siempre confías en nosotras para verte y sentirte espectacular. Acumula puntos cada vez que nos visitas y transforma tu experiencia Fringe en recompensas en quetzales, descuentos y más momentos Fringe.</p>
                 <div class="feature-grid">
                   <img class="feature-image" src="assets/img/menu_tabs/Loyalty-Card.png" alt="Tarjeta Fringe Rewards">
                   <div class="benefit-card">
@@ -93,7 +93,7 @@ type Section = 'inicio' | 'acerca' | 'beneficios' | 'politicas' | 'establecimien
                   </div>
                 </div>
                 <h2>Historia del plan</h2>
-                <p>En Fringe Hair &amp; Beauty sabemos que cada visita es especial, y queremos que esa fidelidad sea recompensada. Fringe Rewards nació como una forma de agradecer tu preferencia con beneficios que te enamorará aún más de la experiencia Fringe.</p>
+                <p>En Fringe Hair &amp; Beauty sabemos que cada visita es especial, y queremos que esa fidelidad sea recompensada. Fringe Rewards nació como una forma de agradecer tu preferencia con beneficios que te enamorarán aún más de la experiencia Fringe.</p>
                 <div class="feature-grid mission-grid">
                   <div><img src="assets/img/menu_tabs/Mision.png" alt="Misión Fringe"><div class="pink-card"><h2>Misión</h2><p>Crear un espacio donde la belleza y el cuidado se celebren contigo.</p></div></div>
                   <div><img src="assets/img/menu_tabs/Vision.png" alt="Visión Fringe"><div class="pink-card"><h2>Visión</h2><p>Nuestra meta es consentirte y fortalecer ese lazo especial que compartimos cada vez que nos visitas.</p></div></div>
@@ -110,7 +110,7 @@ type Section = 'inicio' | 'acerca' | 'beneficios' | 'politicas' | 'establecimien
               <div class="panel-heading"><h1>BENEFICIOS</h1></div>
               <img class="wide-promo" src="assets/img/menu_tabs/Loyalty-Card.png" alt="Fringe Rewards">
               <article class="centered-content">
-                <h2>BENEFICIOS &amp; RECOMPENSAS</h2>
+                <h2>BENEFICIOS Y RECOMPENSAS</h2>
                 <h3>“Ven, acumula y disfruta”</h3>
                 <ol>
                   <li>Gana puntos con estilo: Por cada Q150 de consumo recibes Q5.</li>
@@ -125,18 +125,18 @@ type Section = 'inicio' | 'acerca' | 'beneficios' | 'politicas' | 'establecimien
               <img class="wide-promo" src="assets/img/menu_tabs/Loyalty-Card.png" alt="Fringe Rewards">
               <article class="policy-content">
                 <h2 class="center-text">POLÍTICAS FRINGE</h2>
-                <h3>Términos &amp; Condiciones</h3>
+                <h3>Términos y condiciones</h3>
                 <ol>
                   <li>Los puntos acumulados son válidos por 12 meses.</li>
                   <li>Solo el titular registrado puede acumular y canjear puntos.</li>
                   <li>Los puntos no se pueden combinar con otras promociones o descuentos.</li>
-                  <li>Reposición de tarjeta extraviada tiene un cargo de Q50.00</li>
+                  <li>La reposición de la tarjeta extraviada tiene un cargo de Q50.00.</li>
                 </ol>
                 <h3>Política de privacidad</h3>
                 <p>Tu información está segura con nosotros y se usará exclusivamente para brindarte una mejor experiencia dentro del programa Fringe Rewards.</p>
                 <h3>Restricciones</h3>
                 <ol>
-                  <li>Solo válido en salones Fringe Hair &amp; Beauty.</li>
+                  <li>Solo es válido en los salones Fringe Hair &amp; Beauty.</li>
                   <li>Algunos productos o servicios pueden estar sujetos a disponibilidad.</li>
                 </ol>
                 <p class="center-text">* Aplican restricciones.</p>
@@ -149,13 +149,13 @@ type Section = 'inicio' | 'acerca' | 'beneficios' | 'politicas' | 'establecimien
                   <img src="assets/img/sucursales/Ubicación-Z14.png" alt="Ubicación Fringe Zona 14">
                   <h2>Zona 14 - Matriz</h2>
                   <p>21 calle 5-52 Z14</p>
-                  <p>Ciudad Guatemala, Guatemala</p>
+                  <p>Ciudad de Guatemala, Guatemala</p>
                   <p>Lunes a viernes, 7:00 a.m. a 6:00 p.m.<br>Sábado 7:00 a.m. a 5:00 p.m.</p>
                 </article>
                 <article class="location-card">
                   <img src="assets/img/sucursales/Ubicación-Carretera.png" alt="Ubicación Fringe Carretera">
                   <h2>Fringe Carretera</h2>
-                  <p>Km 14.5 Carretera a El Salvador, Santa Catarina Pinula, Finca La Luz, Puerta Parada, Casa # 600</p>
+                  <p>km 14.5 Carretera a El Salvador, Santa Catarina Pinula, Finca La Luz, Puerta Parada, casa n.º 600</p>
                   <p>Guatemala</p>
                   <p>Lunes a viernes, 7:00 a.m. a 6:00 p.m.<br>Sábado 7:00 a.m. a 5:00 p.m.</p>
                 </article>
@@ -180,17 +180,17 @@ type Section = 'inicio' | 'acerca' | 'beneficios' | 'politicas' | 'establecimien
                   <label>*Nombres<input required name="c1" maxlength="25"></label>
                   <label>*Apellidos<input required name="c2" maxlength="25"></label>
                   <label>Teléfono<input name="c3" maxlength="8" inputmode="numeric" title="Ejemplo de formato: 22224444"></label>
-                  <label>*E-Mail<input required type="email" name="c4" maxlength="50" title="Ejemplo de formato: correo@correo.com"></label>
-                  <label>*No. Tarjeta Cliente<input required name="c5" maxlength="16"></label>
+                  <label>*Correo electrónico<input required type="email" name="c4" maxlength="50" title="Ejemplo de formato: correo@correo.com"></label>
+                  <label>*N.º de tarjeta de cliente<input required name="c5" maxlength="16"></label>
                   <label>*Mensaje<textarea required name="c6" rows="5" maxlength="150"></textarea></label>
                   <button class="submit" type="submit">Enviar</button>
                   @if (contactMessage) { <p class="form-message">{{ contactMessage }}</p> }
                 </form>
                 <aside class="contact-info">
-                  <strong>¿Preguntas? ¿Ideas? ¡Te escuchamos! Envíanos tus comentarios o sugerencias mediante nuestro formulario</strong>
+                  <strong>¿Preguntas? ¿Ideas? ¡Te escuchamos! Envíanos tus comentarios o sugerencias mediante nuestro formulario.</strong>
                   <ul>
-                    <li>Fringe Carretera: Tel: (502) 5588-8642 <a href="https://wa.me/50255888642" target="_blank" rel="noopener">WhatsApp</a></li>
-                    <li>Fringe Zona 14: Tel: (502) 3158-2686 <a href="https://wa.me/50231582686" target="_blank" rel="noopener">WhatsApp</a></li>
+                    <li>Fringe Carretera: Tel.: (502) 5588-8642 <a href="https://wa.me/50255888642" target="_blank" rel="noopener">WhatsApp</a></li>
+                    <li>Fringe Zona 14: Tel.: (502) 3158-2686 <a href="https://wa.me/50231582686" target="_blank" rel="noopener">WhatsApp</a></li>
                   </ul>
                 </aside>
               </div>
