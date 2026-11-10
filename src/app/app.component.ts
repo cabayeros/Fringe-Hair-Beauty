@@ -187,15 +187,14 @@ interface AccountMovement {
                   @if (loginMessage) { <p class="form-message" role="status">{{ loginMessage }}</p> }
                   <div class="demo-access">
                     <p>¿Quieres conocer las pantallas de la cuenta?</p>
-                    <button class="inline-link" type="button" (click)="openAccountDemo()">Explorar vista de demostración</button>
-                    <small>Usa información de ejemplo. No requiere iniciar sesión ni guarda cambios.</small>
+                    <button class="inline-link" type="button" (click)="openAccountDemo()">Acceder a mi cuenta</button>
                   </div>
                 </form>
               } @else {
                 <div class="account-portal" (keydown.escape)="closeAccountMenu()">
                   <button class="account-menu-toggle" type="button" aria-controls="account-menu" [attr.aria-expanded]="accountMenuOpen" (click)="toggleAccountMenu()">
                     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16" /></svg>
-                    <span>Menú de cuenta</span>
+                    <span>Menú</span>
                     <span class="account-menu-current">{{ accountPageLabel }}</span>
                   </button>
                   @if (accountMenuOpen) {
@@ -216,15 +215,16 @@ interface AccountMovement {
                     <button class="account-exit" type="button" (click)="closeAccountDemo()">Volver al inicio de sesión</button>
                   </aside>
                   <div class="account-content">
-                    <header class="account-welcome">
-                      <div><span class="account-eyebrow">FRINGE REWARDS · VISTA DE DEMOSTRACIÓN</span><h2>Hola, Miembro Fringe</h2></div>
-                      <div class="points-badge"><span>Mis puntos</span><strong>128</strong></div>
-                    </header>
+                    @if (accountPage === 'inicio') {
+                      <header class="account-welcome">
+                        <div><span class="account-eyebrow">FRINGE REWARDS</span><h2>Hola, Miembro Fringe</h2></div>
+                        <div class="points-badge"><span>Mis puntos</span><strong>128</strong></div>
+                      </header>
+                    }
                     @if (accountMessage) { <p class="account-notice" role="status">{{ accountMessage }}</p> }
                     @switch (accountPage) {
                       @case ('inicio') {
-                        <section class="account-section">
-                          <h3>Resumen de mi cuenta</h3>
+                        <section class="account-section" aria-label="Resumen de mi cuenta">
                           <dl class="profile-summary">
                             <div><dt>Correo electrónico</dt><dd>miembro&#64;ejemplo.com</dd></div>
                             <div><dt>Teléfono</dt><dd>No registrado</dd></div>
@@ -247,8 +247,7 @@ interface AccountMovement {
                         </section>
                       }
                       @case ('movimientos') {
-                        <section class="account-section">
-                          <h3>Movimientos de la cuenta</h3>
+                        <section class="account-section" aria-label="Movimientos de la cuenta">
                           <div class="movement-filters">
                             <label>Desde <input #fromDate type="date" (input)="setMovementRange('from', fromDate.value)"></label>
                             <label>Hasta <input #untilDate type="date" (input)="setMovementRange('until', untilDate.value)"></label>
@@ -283,9 +282,8 @@ interface AccountMovement {
                         </section>
                       }
                       @case ('password') {
-                        <section class="account-section account-form-section">
-                          <h3>Cambiar contraseña</h3>
-                          <form class="account-form" (submit)="$event.preventDefault(); showDemoNotice('La demostración no envía ni guarda cambios.')">
+                        <section class="account-section account-form-section" aria-label="Cambiar contraseña">
+                          <form class="account-form" (submit)="$event.preventDefault(); showAccountNotice('El servicio para guardar cambios aún no está disponible.')">
                             <label>Contraseña anterior<input type="password" autocomplete="current-password" required></label>
                             <label>Nueva contraseña<input type="password" autocomplete="new-password" placeholder="Nueva contraseña" required minlength="8"></label>
                             <label>Confirmar contraseña<input type="password" autocomplete="new-password" placeholder="Confirma tu nueva contraseña" required minlength="8"></label>
@@ -294,9 +292,8 @@ interface AccountMovement {
                         </section>
                       }
                       @case ('datos') {
-                        <section class="account-section account-form-section">
-                          <h3>Actualizar datos</h3>
-                          <form class="account-form profile-form" (submit)="$event.preventDefault(); showDemoNotice('La demostración no envía ni guarda cambios.')">
+                        <section class="account-section account-form-section" aria-label="Actualizar datos">
+                          <form class="account-form profile-form" (submit)="$event.preventDefault(); showAccountNotice('El servicio para guardar cambios aún no está disponible.')">
                             <label>Nombre<input type="text" autocomplete="given-name" placeholder="Tu nombre" required></label>
                             <label>Apellido<input type="text" autocomplete="family-name" placeholder="Tu apellido" required></label>
                             <label>Dirección<input type="text" autocomplete="street-address" placeholder="Tu dirección"></label>
@@ -308,8 +305,7 @@ interface AccountMovement {
                         </section>
                       }
                       @case ('establecimientos') {
-                        <section class="account-section">
-                          <h3>Establecimientos Fringe</h3>
+                        <section class="account-section" aria-label="Establecimientos Fringe">
                           <div class="account-locations">
                             <article><img src="assets/img/sucursales/Ubicación-Z14.png" alt=""><div><h4>Fringe Zona 14</h4><p>21 calle 5-52, Zona 14<br>Ciudad de Guatemala</p><p>Lunes a viernes, 7:00 a.m. a 6:00 p.m.<br>Sábado, 7:00 a.m. a 5:00 p.m.</p></div></article>
                             <article><img src="assets/img/sucursales/Ubicación-Carretera.png" alt=""><div><h4>Fringe Carretera</h4><p>km 14.5 Carretera a El Salvador, Santa Catarina Pinula</p><p>Lunes a viernes, 7:00 a.m. a 6:00 p.m.<br>Sábado, 7:00 a.m. a 5:00 p.m.</p></div></article>
@@ -317,9 +313,8 @@ interface AccountMovement {
                         </section>
                       }
                       @case ('premios') {
-                        <section class="account-section">
-                          <h3>Premios y recompensas</h3>
-                          <p class="rewards-intro">Explora algunas ideas de recompensas Fringe. En esta vista de demostración no se realizan canjes.</p>
+                        <section class="account-section" aria-label="Premios y recompensas">
+                          <p class="rewards-intro">Canjea tus puntos por recompensas y experiencias Fringe.</p>
                           <div class="account-rewards">
                             <article><img src="assets/img/menu_tabs/Loyalty-Card.png" alt=""><h4>Descuento en tu próxima visita</h4><p>Una recompensa para disfrutar tu próxima experiencia Fringe.</p><span>Desde 100 puntos</span><button type="button" disabled>Próximamente</button></article>
                             <article><img src="assets/img/menu_tabs/Loyalty-Card.png" alt=""><h4>Tratamiento capilar</h4><p>Consiente tu cabello con uno de nuestros servicios favoritos.</p><span>Desde 250 puntos</span><button type="button" disabled>Próximamente</button></article>
@@ -543,7 +538,7 @@ export class AppComponent implements OnInit, OnDestroy {
     this.movementPage = Math.min(Math.max(1, page), this.movementPageCount);
   }
 
-  showDemoNotice(message: string): void {
+  showAccountNotice(message: string): void {
     this.accountMessage = message;
   }
 
