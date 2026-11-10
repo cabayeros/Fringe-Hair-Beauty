@@ -1,6 +1,17 @@
 import { ChangeDetectorRef, Component, OnDestroy, OnInit, inject } from '@angular/core';
 
 type Section = 'inicio' | 'acerca' | 'beneficios' | 'politicas' | 'establecimientos' | 'cuenta' | 'contacto';
+type AccountPage = 'inicio' | 'movimientos' | 'password' | 'datos' | 'establecimientos' | 'premios';
+
+interface AccountMovement {
+  code: string;
+  location: string;
+  description: string;
+  date: string;
+  charge: string;
+  credit: string;
+  balance: string;
+}
 
 @Component({
   selector: 'app-root',
@@ -162,16 +173,145 @@ type Section = 'inicio' | 'acerca' | 'beneficios' | 'politicas' | 'establecimien
               </div>
             }
             @case ('cuenta') {
-              <div class="panel-heading"><h1>MI CUENTA</h1></div>
-              <form class="login-form" (submit)="$event.preventDefault(); submitLogin()">
-                <label class="sr-only" for="username">Nombre de Usuario</label>
-                <input id="username" name="c1" autocomplete="username" placeholder="Nombre de Usuario" required maxlength="48">
-                <label class="sr-only" for="password">Contraseña</label>
-                <input id="password" name="c2" type="password" autocomplete="current-password" placeholder="Contraseña" required maxlength="17">
-                <label class="remember"><input type="checkbox" name="remember"> Recordar contraseña</label>
-                <button class="submit" type="submit">Enviar</button>
-                @if (loginMessage) { <p class="form-message">{{ loginMessage }}</p> }
-              </form>
+              <div class="panel-heading account-title"><h1>MI CUENTA</h1></div>
+              @if (!accountDemo) {
+                <form class="login-form" (submit)="$event.preventDefault(); submitLogin()">
+                  <h2>Inicia sesión</h2>
+                  <p>Accede a tus puntos, movimientos y datos de Fringe Rewards.</p>
+                  <label class="sr-only" for="username">Nombre de Usuario</label>
+                  <input id="username" name="c1" autocomplete="username" placeholder="Nombre de Usuario" required maxlength="48">
+                  <label class="sr-only" for="password">Contraseña</label>
+                  <input id="password" name="c2" type="password" autocomplete="current-password" placeholder="Contraseña" required maxlength="17">
+                  <label class="remember"><input type="checkbox" name="remember"> Recordar contraseña</label>
+                  <button class="submit" type="submit">Enviar</button>
+                  @if (loginMessage) { <p class="form-message" role="status">{{ loginMessage }}</p> }
+                  <div class="demo-access">
+                    <p>¿Quieres conocer las pantallas de la cuenta?</p>
+                    <button class="inline-link" type="button" (click)="openAccountDemo()">Explorar vista de demostración</button>
+                    <small>Usa información de ejemplo. No requiere iniciar sesión ni guarda cambios.</small>
+                  </div>
+                </form>
+              } @else {
+                <div class="account-portal">
+                  <aside class="account-sidebar" aria-label="Menú de cuenta">
+                    <h2>Mi cuenta</h2>
+                    <nav>
+                      @for (item of accountNavItems; track item.id) {
+                        <button type="button" [class.active]="accountPage === item.id" (click)="navigateAccount(item.id)">{{ item.label }}</button>
+                      }
+                    </nav>
+                    <button class="account-exit" type="button" (click)="closeAccountDemo()">Volver al inicio de sesión</button>
+                  </aside>
+                  <div class="account-content">
+                    <header class="account-welcome">
+                      <div><span class="account-eyebrow">FRINGE REWARDS · VISTA DE DEMOSTRACIÓN</span><h2>Hola, Miembro Fringe</h2></div>
+                      <div class="points-badge"><span>Mis puntos</span><strong>128</strong></div>
+                    </header>
+                    @if (accountMessage) { <p class="account-notice" role="status">{{ accountMessage }}</p> }
+                    @switch (accountPage) {
+                      @case ('inicio') {
+                        <section class="account-section">
+                          <h3>Resumen de mi cuenta</h3>
+                          <dl class="profile-summary">
+                            <div><dt>Correo electrónico</dt><dd>miembro&#64;ejemplo.com</dd></div>
+                            <div><dt>Teléfono</dt><dd>No registrado</dd></div>
+                            <div><dt>Dirección</dt><dd>Agrega tu dirección en Actualizar datos</dd></div>
+                            <div><dt>Tarjeta Fringe Rewards</dt><dd>•••• •••• •••• 4821</dd></div>
+                          </dl>
+                        </section>
+                        <section class="account-section">
+                          <div class="section-title-row"><h3>Movimientos recientes</h3><button class="text-action" type="button" (click)="navigateAccount('movimientos')">Ver todos</button></div>
+                          <div class="account-table-wrap">
+                            <table class="account-table">
+                              <thead><tr><th>Código</th><th>Establecimiento</th><th>Descripción</th><th>Fecha</th><th>Cargo</th><th>Abono</th><th>Saldo</th></tr></thead>
+                              <tbody>
+                                @for (movement of recentMovements.slice(0, 5); track movement.code) {
+                                  <tr><td>{{ movement.code }}</td><td>{{ movement.location }}</td><td>{{ movement.description }}</td><td>{{ movement.date }}</td><td>{{ movement.charge }}</td><td>{{ movement.credit }}</td><td>{{ movement.balance }}</td></tr>
+                                }
+                              </tbody>
+                            </table>
+                          </div>
+                        </section>
+                      }
+                      @case ('movimientos') {
+                        <section class="account-section">
+                          <h3>Movimientos de la cuenta</h3>
+                          <div class="movement-filters">
+                            <label>Desde <input #fromDate type="date" (input)="setMovementRange('from', fromDate.value)"></label>
+                            <label>Hasta <input #untilDate type="date" (input)="setMovementRange('until', untilDate.value)"></label>
+                            <button class="text-action" type="button" (click)="clearMovementRange(fromDate, untilDate)">Limpiar fechas</button>
+                          </div>
+                          <div class="account-table-wrap">
+                            <table class="account-table">
+                              <thead><tr><th>Código</th><th>Establecimiento</th><th>Descripción</th><th>Fecha</th><th>Cargo</th><th>Abono</th><th>Saldo</th></tr></thead>
+                              <tbody>
+                                @for (movement of pagedMovements; track movement.code) {
+                                  <tr><td>{{ movement.code }}</td><td>{{ movement.location }}</td><td>{{ movement.description }}</td><td>{{ movement.date }}</td><td>{{ movement.charge }}</td><td>{{ movement.credit }}</td><td>{{ movement.balance }}</td></tr>
+                                } @empty {
+                                  <tr><td class="empty-row" colspan="7">No hay movimientos en el período seleccionado.</td></tr>
+                                }
+                              </tbody>
+                            </table>
+                          </div>
+                          <div class="movement-pagination">
+                            <span>Mostrando {{ visibleMovements.length ? (movementPage - 1) * 5 + 1 : 0 }}–{{ movementDisplayEnd }} de {{ visibleMovements.length }} movimientos de ejemplo</span>
+                            <nav aria-label="Paginación de movimientos">
+                              <button type="button" [disabled]="movementPage === 1" (click)="navigateMovementsPage(movementPage - 1)">Anterior</button>
+                              <span>Página {{ movementPage }} / {{ movementPageCount }}</span>
+                              <button type="button" [disabled]="movementPage === movementPageCount" (click)="navigateMovementsPage(movementPage + 1)">Siguiente</button>
+                            </nav>
+                          </div>
+                        </section>
+                      }
+                      @case ('password') {
+                        <section class="account-section account-form-section">
+                          <h3>Cambiar contraseña</h3>
+                          <form class="account-form" (submit)="$event.preventDefault(); showDemoNotice('La demostración no envía ni guarda cambios.')">
+                            <label>Contraseña anterior<input type="password" autocomplete="current-password" required></label>
+                            <label>Nueva contraseña<input type="password" autocomplete="new-password" placeholder="Nueva contraseña" required minlength="8"></label>
+                            <label>Confirmar contraseña<input type="password" autocomplete="new-password" placeholder="Confirma tu nueva contraseña" required minlength="8"></label>
+                            <button class="submit" type="submit">Guardar contraseña</button>
+                          </form>
+                        </section>
+                      }
+                      @case ('datos') {
+                        <section class="account-section account-form-section">
+                          <h3>Actualizar datos</h3>
+                          <form class="account-form profile-form" (submit)="$event.preventDefault(); showDemoNotice('La demostración no envía ni guarda cambios.')">
+                            <label>Nombre<input type="text" autocomplete="given-name" placeholder="Tu nombre" required></label>
+                            <label>Apellido<input type="text" autocomplete="family-name" placeholder="Tu apellido" required></label>
+                            <label>Dirección<input type="text" autocomplete="street-address" placeholder="Tu dirección"></label>
+                            <label>Teléfono<input type="tel" autocomplete="tel" placeholder="Teléfono"></label>
+                            <label>Teléfono móvil<input type="tel" autocomplete="tel-national" placeholder="Teléfono móvil"></label>
+                            <label>Correo electrónico<input type="email" autocomplete="email" placeholder="correo@ejemplo.com" required></label>
+                            <button class="submit" type="submit">Guardar datos</button>
+                          </form>
+                        </section>
+                      }
+                      @case ('establecimientos') {
+                        <section class="account-section">
+                          <h3>Establecimientos Fringe</h3>
+                          <div class="account-locations">
+                            <article><img src="assets/img/sucursales/Ubicación-Z14.png" alt=""><div><h4>Fringe Zona 14</h4><p>21 calle 5-52, Zona 14<br>Ciudad de Guatemala</p><p>Lunes a viernes, 7:00 a.m. a 6:00 p.m.<br>Sábado, 7:00 a.m. a 5:00 p.m.</p></div></article>
+                            <article><img src="assets/img/sucursales/Ubicación-Carretera.png" alt=""><div><h4>Fringe Carretera</h4><p>km 14.5 Carretera a El Salvador, Santa Catarina Pinula</p><p>Lunes a viernes, 7:00 a.m. a 6:00 p.m.<br>Sábado, 7:00 a.m. a 5:00 p.m.</p></div></article>
+                          </div>
+                        </section>
+                      }
+                      @case ('premios') {
+                        <section class="account-section">
+                          <h3>Premios y recompensas</h3>
+                          <p class="rewards-intro">Explora algunas ideas de recompensas Fringe. En esta vista de demostración no se realizan canjes.</p>
+                          <div class="account-rewards">
+                            <article><img src="assets/img/menu_tabs/Loyalty-Card.png" alt=""><h4>Descuento en tu próxima visita</h4><p>Una recompensa para disfrutar tu próxima experiencia Fringe.</p><span>Desde 100 puntos</span><button type="button" disabled>Próximamente</button></article>
+                            <article><img src="assets/img/menu_tabs/Loyalty-Card.png" alt=""><h4>Tratamiento capilar</h4><p>Consiente tu cabello con uno de nuestros servicios favoritos.</p><span>Desde 250 puntos</span><button type="button" disabled>Próximamente</button></article>
+                            <article><img src="assets/img/menu_tabs/Loyalty-Card.png" alt=""><h4>Producto de cuidado</h4><p>Elige un detalle especial para continuar tu rutina en casa.</p><span>Desde 400 puntos</span><button type="button" disabled>Próximamente</button></article>
+                          </div>
+                        </section>
+                      }
+                    }
+                  </div>
+                </div>
+              }
             }
             @case ('contacto') {
               <div class="panel-heading"><h1>CONTÁCTANOS</h1></div>
@@ -206,6 +346,24 @@ type Section = 'inicio' | 'acerca' | 'beneficios' | 'politicas' | 'establecimien
   `,
 })
 export class AppComponent implements OnInit, OnDestroy {
+  readonly accountNavItems: { id: AccountPage; label: string }[] = [
+    { id: 'inicio', label: 'Inicio' },
+    { id: 'movimientos', label: 'Mis movimientos' },
+    { id: 'password', label: 'Cambiar contraseña' },
+    { id: 'datos', label: 'Actualizar datos' },
+    { id: 'establecimientos', label: 'Establecimientos' },
+    { id: 'premios', label: 'Premios' },
+  ];
+  readonly recentMovements: AccountMovement[] = [
+    { code: 'FR-1048', location: 'Fringe Zona 14', description: 'Compra de servicios', date: '2026-10-28', charge: 'Q0.00', credit: '12', balance: '128' },
+    { code: 'FR-1032', location: 'Fringe Carretera', description: 'Compra de productos', date: '2026-10-12', charge: 'Q0.00', credit: '8', balance: '116' },
+    { code: 'FR-1019', location: 'Fringe Zona 14', description: 'Canje de recompensa', date: '2026-09-25', charge: '30', credit: 'Q0.00', balance: '108' },
+    { code: 'FR-1004', location: 'Fringe Carretera', description: 'Compra de servicios', date: '2026-09-08', charge: 'Q0.00', credit: '18', balance: '138' },
+    { code: 'FR-0987', location: 'Fringe Zona 14', description: 'Compra de productos', date: '2026-08-21', charge: 'Q0.00', credit: '10', balance: '120' },
+    { code: 'FR-0971', location: 'Fringe Carretera', description: 'Compra de servicios', date: '2026-08-03', charge: 'Q0.00', credit: '14', balance: '110' },
+    { code: 'FR-0945', location: 'Fringe Zona 14', description: 'Canje de recompensa', date: '2026-07-18', charge: '20', credit: 'Q0.00', balance: '96' },
+    { code: 'FR-0912', location: 'Fringe Carretera', description: 'Compra de productos', date: '2026-07-02', charge: 'Q0.00', credit: '9', balance: '116' },
+  ];
   readonly navItems: { id: Section; label: string }[] = [
     { id: 'inicio', label: 'INICIO' }, { id: 'acerca', label: 'ACERCA DE' },
     { id: 'beneficios', label: 'BENEFICIOS' }, { id: 'politicas', label: 'POLÍTICAS' },
@@ -219,8 +377,34 @@ export class AppComponent implements OnInit, OnDestroy {
   private readonly changeDetector = inject(ChangeDetectorRef);
   loginMessage = '';
   contactMessage = '';
+  accountDemo = false;
+  accountPage: AccountPage = 'inicio';
+  accountMessage = '';
+  movementFrom = '';
+  movementUntil = '';
+  movementPage = 1;
   private controlsTimer: ReturnType<typeof setTimeout> | undefined;
   private slideTimer: ReturnType<typeof setInterval> | undefined;
+
+  get visibleMovements(): AccountMovement[] {
+    return this.recentMovements.filter((movement) =>
+      (!this.movementFrom || movement.date >= this.movementFrom) &&
+      (!this.movementUntil || movement.date <= this.movementUntil),
+    );
+  }
+
+  get pagedMovements(): AccountMovement[] {
+    const start = (this.movementPage - 1) * 5;
+    return this.visibleMovements.slice(start, start + 5);
+  }
+
+  get movementPageCount(): number {
+    return Math.max(1, Math.ceil(this.visibleMovements.length / 5));
+  }
+
+  get movementDisplayEnd(): number {
+    return Math.min(this.movementPage * 5, this.visibleMovements.length);
+  }
 
   ngOnInit(): void {
     this.startSlideRotation();
@@ -235,6 +419,7 @@ export class AppComponent implements OnInit, OnDestroy {
     }
     this.loginMessage = '';
     this.contactMessage = '';
+    this.accountMessage = '';
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
@@ -285,6 +470,47 @@ export class AppComponent implements OnInit, OnDestroy {
 
   submitLogin(): void {
     this.loginMessage = 'El inicio de sesión requiere el servicio de autenticación del portal Fringe Rewards.';
+  }
+
+  openAccountDemo(): void {
+    this.accountDemo = true;
+    this.accountPage = 'inicio';
+    this.accountMessage = '';
+    this.movementFrom = '';
+    this.movementUntil = '';
+    this.movementPage = 1;
+  }
+
+  closeAccountDemo(): void {
+    this.accountDemo = false;
+    this.accountMessage = '';
+  }
+
+  navigateAccount(page: AccountPage): void {
+    this.accountPage = page;
+    this.accountMessage = '';
+  }
+
+  setMovementRange(range: 'from' | 'until', value: string): void {
+    if (range === 'from') this.movementFrom = value;
+    else this.movementUntil = value;
+    this.movementPage = 1;
+  }
+
+  clearMovementRange(fromDate: HTMLInputElement, untilDate: HTMLInputElement): void {
+    this.movementFrom = '';
+    this.movementUntil = '';
+    this.movementPage = 1;
+    fromDate.value = '';
+    untilDate.value = '';
+  }
+
+  navigateMovementsPage(page: number): void {
+    this.movementPage = Math.min(Math.max(1, page), this.movementPageCount);
+  }
+
+  showDemoNotice(message: string): void {
+    this.accountMessage = message;
   }
 
   submitContact(): void {

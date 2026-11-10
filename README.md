@@ -23,4 +23,4 @@ Publica el contenido de `dist/fringe/browser`. El build usa rutas relativas para
 
 ## Contenido
 
-Se conservaron las imágenes, logos, tipografías e icono incluidos en la copia disponible y se recuperaron de la página activa los textos e imágenes de Acerca de, Beneficios, Políticas, Establecimientos y Contáctanos. El inicio de sesión y el envío del formulario de contacto necesitan servicios externos; las rutas PHP originales no se incluyeron.
+Se conservaron las imágenes, logos, tipografías e icono incluidos en la copia disponible y se recuperaron de la página activa los textos e imágenes de Acerca de, Beneficios, Políticas, Establecimientos y Contáctanos. Mi Cuenta incluye una vista de demostración con resumen, movimientos, perfil, establecimientos y premios; sus datos son de ejemplo y los cambios no se guardan. El inicio de sesión real y el envío del formulario de contacto necesitan servicios externos; las rutas PHP originales no se incluyeron.
