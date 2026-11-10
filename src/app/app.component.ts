@@ -256,9 +256,15 @@ interface AccountMovement {
                           <div class="movement-pagination">
                             <span>Mostrando {{ visibleMovements.length ? (movementPage - 1) * 5 + 1 : 0 }}–{{ movementDisplayEnd }} de {{ visibleMovements.length }} movimientos de ejemplo</span>
                             <nav aria-label="Paginación de movimientos">
-                              <button type="button" [disabled]="movementPage === 1" (click)="navigateMovementsPage(movementPage - 1)">Anterior</button>
-                              <span>Página {{ movementPage }} / {{ movementPageCount }}</span>
-                              <button type="button" [disabled]="movementPage === movementPageCount" (click)="navigateMovementsPage(movementPage + 1)">Siguiente</button>
+                              <button class="pager-button" type="button" aria-label="Página anterior" [disabled]="movementPage === 1" (click)="navigateMovementsPage(movementPage - 1)">
+                                <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M12.5 4.5 7 10l5.5 5.5" /></svg>
+                                <span>Anterior</span>
+                              </button>
+                              <span class="pager-status" aria-live="polite">Página <strong>{{ movementPage }}</strong> de {{ movementPageCount }}</span>
+                              <button class="pager-button" type="button" aria-label="Página siguiente" [disabled]="movementPage === movementPageCount" (click)="navigateMovementsPage(movementPage + 1)">
+                                <span>Siguiente</span>
+                                <svg viewBox="0 0 20 20" aria-hidden="true"><path d="m7.5 4.5 5.5 5.5-5.5 5.5" /></svg>
+                              </button>
                             </nav>
                           </div>
                         </section>

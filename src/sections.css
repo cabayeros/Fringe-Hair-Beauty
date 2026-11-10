@@ -684,23 +684,69 @@ body {
 }
 
 .movement-pagination nav {
+  display: grid;
+  grid-template-columns: auto minmax(100px, auto) auto;
+  align-items: center;
   justify-content: flex-end;
+  gap: 8px;
 }
 
-.movement-pagination button {
-  min-height: 34px;
-  padding: 6px 10px;
-  border: 1px solid var(--fringe-line);
-  border-radius: 6px;
+.movement-pagination .pager-button {
+  display: inline-flex;
+  min-height: 40px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 13px;
+  border: 1px solid #dedbd1;
+  border-radius: 999px;
   background: #fff;
   color: var(--fringe-ink);
   font: inherit;
+  font-size: 13px;
+  font-weight: 600;
   cursor: pointer;
+  transition: color 150ms ease, border-color 150ms ease, background-color 150ms ease, box-shadow 150ms ease, transform 150ms ease;
 }
 
-.movement-pagination button:disabled {
+.movement-pagination .pager-button svg {
+  width: 17px;
+  height: 17px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
+}
+
+.movement-pagination .pager-button:not(:disabled):hover {
+  transform: translateY(-1px);
+  border-color: #d3bf00;
+  background: #fffdf0;
+  box-shadow: 0 3px 10px rgb(57 48 10 / 8%);
+}
+
+.movement-pagination .pager-button:focus-visible {
+  outline: 3px solid rgb(254 225 2 / 45%);
+  outline-offset: 2px;
+}
+
+.movement-pagination .pager-button:disabled {
+  border-color: #ebe9e3;
+  background: #f7f6f2;
   color: #aaa79e;
   cursor: not-allowed;
+}
+
+.movement-pagination .pager-status {
+  padding: 0 8px;
+  color: var(--fringe-muted);
+  text-align: center;
+  white-space: nowrap;
+}
+
+.movement-pagination .pager-status strong {
+  color: var(--fringe-ink);
 }
 
 .movement-filters {
@@ -905,6 +951,24 @@ body {
 
   .account-form .submit {
     width: 100%;
+  }
+
+  .movement-pagination {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .movement-pagination nav {
+    width: 100%;
+    grid-template-columns: 1fr auto 1fr;
+  }
+
+  .movement-pagination .pager-button {
+    padding-inline: 10px;
+  }
+
+  .movement-pagination .pager-button:last-child {
+    justify-self: end;
   }
 }
 
