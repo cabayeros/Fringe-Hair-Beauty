@@ -192,9 +192,22 @@ interface AccountMovement {
                   </div>
                 </form>
               } @else {
-                <div class="account-portal">
-                  <aside class="account-sidebar" aria-label="Menú de cuenta">
-                    <h2>Mi cuenta</h2>
+                <div class="account-portal" (keydown.escape)="closeAccountMenu()">
+                  <button class="account-menu-toggle" type="button" aria-controls="account-menu" [attr.aria-expanded]="accountMenuOpen" (click)="toggleAccountMenu()">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16" /></svg>
+                    <span>Menú de cuenta</span>
+                    <span class="account-menu-current">{{ accountPageLabel }}</span>
+                  </button>
+                  @if (accountMenuOpen) {
+                    <button class="account-drawer-backdrop" type="button" aria-label="Cerrar menú de cuenta" (click)="closeAccountMenu()"></button>
+                  }
+                  <aside id="account-menu" class="account-sidebar" [class.mobile-open]="accountMenuOpen" aria-label="Menú de cuenta">
+                    <div class="account-sidebar-heading">
+                      <h2>Mi cuenta</h2>
+                      <button class="account-menu-close" type="button" aria-label="Cerrar menú de cuenta" (click)="closeAccountMenu()">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" /></svg>
+                      </button>
+                    </div>
                     <nav>
                       @for (item of accountNavItems; track item.id) {
                         <button type="button" [class.active]="accountPage === item.id" (click)="navigateAccount(item.id)">{{ item.label }}</button>
@@ -385,6 +398,7 @@ export class AppComponent implements OnInit, OnDestroy {
   contactMessage = '';
   accountDemo = false;
   accountPage: AccountPage = 'inicio';
+  accountMenuOpen = false;
   accountMessage = '';
   movementFrom = '';
   movementUntil = '';
@@ -410,6 +424,10 @@ export class AppComponent implements OnInit, OnDestroy {
 
   get movementDisplayEnd(): number {
     return Math.min(this.movementPage * 5, this.visibleMovements.length);
+  }
+
+  get accountPageLabel(): string {
+    return this.accountNavItems.find((item) => item.id === this.accountPage)?.label ?? 'Mi cuenta';
   }
 
   ngOnInit(): void {
@@ -489,12 +507,22 @@ export class AppComponent implements OnInit, OnDestroy {
 
   closeAccountDemo(): void {
     this.accountDemo = false;
+    this.accountMenuOpen = false;
     this.accountMessage = '';
   }
 
   navigateAccount(page: AccountPage): void {
     this.accountPage = page;
+    this.accountMenuOpen = false;
     this.accountMessage = '';
+  }
+
+  toggleAccountMenu(): void {
+    this.accountMenuOpen = !this.accountMenuOpen;
+  }
+
+  closeAccountMenu(): void {
+    this.accountMenuOpen = false;
   }
 
   setMovementRange(range: 'from' | 'until', value: string): void {

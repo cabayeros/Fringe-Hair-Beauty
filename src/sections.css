@@ -456,11 +456,23 @@ body {
   box-shadow: 0 8px 24px rgb(57 48 10 / 6%);
 }
 
-.account-sidebar h2 {
+.account-sidebar-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   padding: 18px 20px;
   border-bottom: 1px solid var(--fringe-line);
   background: #f7f6f2;
+}
+
+.account-sidebar-heading h2 {
   font-size: 24px;
+}
+
+.account-menu-toggle,
+.account-menu-close,
+.account-drawer-backdrop {
+  display: none;
 }
 
 .account-sidebar nav {
@@ -921,8 +933,103 @@ body {
     gap: 12px;
   }
 
+  .account-menu-toggle {
+    display: flex;
+    min-height: 48px;
+    grid-column: 1 / -1;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    border: 1px solid var(--fringe-line);
+    border-radius: 9px;
+    background: #fff;
+    box-shadow: 0 4px 14px rgb(57 48 10 / 5%);
+    color: var(--fringe-ink);
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+  }
+
+  .account-menu-toggle svg,
+  .account-menu-close svg {
+    width: 21px;
+    height: 21px;
+    flex: 0 0 auto;
+    fill: none;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-width: 1.8;
+  }
+
+  .account-menu-current {
+    margin-left: auto;
+    color: var(--fringe-muted);
+    font-size: 13px;
+  }
+
+  .account-sidebar {
+    position: fixed;
+    z-index: 31;
+    inset: 0 auto 0 0;
+    width: min(320px, 86vw);
+    max-height: 100dvh;
+    overflow-y: auto;
+    border: 0;
+    border-radius: 0 16px 16px 0;
+    box-shadow: 12px 0 40px rgb(0 0 0 / 18%);
+    visibility: hidden;
+    transform: translateX(-105%);
+    transition: transform 220ms ease, visibility 220ms ease;
+  }
+
+  .account-sidebar.mobile-open {
+    visibility: visible;
+    transform: translateX(0);
+  }
+
+  .account-sidebar-heading {
+    min-height: 72px;
+    padding: 16px 18px;
+  }
+
+  .account-menu-close {
+    display: grid;
+    width: 40px;
+    height: 40px;
+    place-items: center;
+    padding: 0;
+    border: 1px solid var(--fringe-line);
+    border-radius: 50%;
+    background: #fff;
+    color: var(--fringe-ink);
+    cursor: pointer;
+  }
+
   .account-sidebar nav {
     grid-template-columns: 1fr;
+    padding: 12px;
+  }
+
+  .account-sidebar nav button {
+    min-height: 48px;
+  }
+
+  .account-exit {
+    width: calc(100% - 24px);
+    margin: 4px 12px 12px;
+    border-top: 1px solid var(--fringe-line);
+  }
+
+  .account-drawer-backdrop {
+    position: fixed;
+    z-index: 30;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    background: rgb(28 27 24 / 42%);
+    cursor: pointer;
   }
 
   .account-welcome {
@@ -969,6 +1076,12 @@ body {
 
   .movement-pagination .pager-button:last-child {
     justify-self: end;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .account-sidebar {
+    transition: none;
   }
 }
 
