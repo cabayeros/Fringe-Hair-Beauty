@@ -1,6 +1,35 @@
 import { ChangeDetectorRef, Component, OnDestroy, OnInit, inject } from '@angular/core';
 
 type Section = 'inicio' | 'acerca' | 'beneficios' | 'politicas' | 'establecimientos' | 'cuenta' | 'contacto';
+type AccountPage = 'inicio' | 'movimientos' | 'password' | 'datos' | 'establecimientos' | 'premios';
+
+export interface AccountProfile {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  mobile: string;
+  address: string;
+  cardNumber: string;
+  points: number;
+}
+
+export interface AccountMovement {
+  code: string;
+  location: string;
+  description: string;
+  date: string;
+  charge: string;
+  credit: string;
+  balance: string;
+}
+
+export interface AccountReward {
+  name: string;
+  description: string;
+  points: number;
+  image?: string;
+}
 
 @Component({
   selector: 'app-root',
@@ -9,7 +38,12 @@ type Section = 'inicio' | 'acerca' | 'beneficios' | 'politicas' | 'establecimien
     <main class="site-shell">
       <div class="topline">
         <span>.:: Fringe Hair and Beauty ::. | 0.0.9 |</span>
-        <button class="login-link" type="button" (click)="navigate('cuenta')">Iniciar sesión</button>
+        @if (accountProfile) {
+          <span>Bienvenida, {{ accountProfile.firstName }}</span>
+          <button class="login-link" type="button" (click)="signOut()">Cerrar sesión</button>
+        } @else {
+          <button class="login-link" type="button" (click)="navigate('cuenta')">Iniciar sesión</button>
+        }
       </div>
       <header class="brand-row">
         <a class="brand" (click)="navigate('inicio')" aria-label="Fringe Hair and Beauty, inicio">
@@ -162,18 +196,167 @@ type Section = 'inicio' | 'acerca' | 'beneficios' | 'politicas' | 'establecimien
               </div>
             }
             @case ('cuenta') {
-              <div class="panel-heading"><h1>MI CUENTA</h1></div>
-              <form class="login-form" (submit)="$event.preventDefault(); submitLogin()">
-                <h2>Inicia sesión</h2>
-                <p>Accede a tus puntos y beneficios de Fringe Rewards.</p>
-                <label class="sr-only" for="username">Nombre de Usuario</label>
-                <input id="username" name="c1" autocomplete="username" placeholder="Nombre de Usuario" required maxlength="48">
-                <label class="sr-only" for="password">Contraseña</label>
-                <input id="password" name="c2" type="password" autocomplete="current-password" placeholder="Contraseña" required maxlength="17">
-                <label class="remember"><input type="checkbox" name="remember"> Recordar contraseña</label>
-                <button class="submit" type="submit">Enviar</button>
-                @if (loginMessage) { <p class="form-message" role="status">{{ loginMessage }}</p> }
-              </form>
+              @if (!accountProfile) {
+                <div class="panel-heading"><h1>MI CUENTA</h1></div>
+                <form class="login-form" (submit)="$event.preventDefault(); submitLogin()">
+                  <h2>Inicia sesión</h2>
+                  <p>Accede a tus puntos y beneficios de Fringe Rewards.</p>
+                  <label class="sr-only" for="username">Nombre de Usuario</label>
+                  <input id="username" name="c1" autocomplete="username" placeholder="Nombre de Usuario" required maxlength="48">
+                  <label class="sr-only" for="password">Contraseña</label>
+                  <input id="password" name="c2" type="password" autocomplete="current-password" placeholder="Contraseña" required maxlength="17">
+                  <label class="remember"><input type="checkbox" name="remember"> Recordar contraseña</label>
+                  <button class="submit" type="submit">Enviar</button>
+                  @if (loginMessage) { <p class="form-message" role="status">{{ loginMessage }}</p> }
+                </form>
+              } @else {
+                <div class="account-portal" (keydown.escape)="closeAccountMenu()">
+                  <button class="account-menu-toggle" type="button" aria-controls="account-menu" [attr.aria-expanded]="accountMenuOpen" (click)="toggleAccountMenu()">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16" /></svg>
+                    <span>Menú de cuenta</span>
+                    <span class="account-menu-current">{{ accountPageLabel }}</span>
+                  </button>
+                  @if (accountMenuOpen) {
+                    <button class="account-drawer-backdrop" type="button" aria-label="Cerrar menú de cuenta" (click)="closeAccountMenu()"></button>
+                  }
+                  <aside id="account-menu" class="account-sidebar" [class.mobile-open]="accountMenuOpen" aria-label="Menú de cuenta">
+                    <div class="account-sidebar-heading">
+                      <h2>Mi cuenta</h2>
+                      <button class="account-menu-close" type="button" aria-label="Cerrar menú de cuenta" (click)="closeAccountMenu()">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" /></svg>
+                      </button>
+                    </div>
+                    <nav>
+                      @for (item of accountNavItems; track item.id) {
+                        <button type="button" [class.active]="accountPage === item.id" [attr.aria-current]="accountPage === item.id ? 'page' : null" (click)="navigateAccount(item.id)">{{ item.label }}</button>
+                      }
+                    </nav>
+                    <button class="account-exit" type="button" (click)="signOut()">Cerrar sesión</button>
+                  </aside>
+                  <div class="account-content">
+                    @if (accountPage === 'inicio') {
+                      <header class="account-welcome">
+                        <div><span class="account-eyebrow">FRINGE REWARDS</span><h2>Hola, {{ accountProfile.firstName }}</h2></div>
+                        <div class="points-badge"><span>Mis puntos</span><strong>{{ accountProfile.points }}</strong></div>
+                      </header>
+                    }
+                    @if (accountNotice) { <p class="account-notice" role="status">{{ accountNotice }}</p> }
+                    @switch (accountPage) {
+                      @case ('inicio') {
+                        <section class="account-section" aria-label="Resumen de mi cuenta">
+                          <dl class="profile-summary">
+                            <div><dt>Correo electrónico</dt><dd>{{ accountProfile.email || 'No registrado' }}</dd></div>
+                            <div><dt>Teléfono</dt><dd>{{ accountProfile.phone || 'No registrado' }}</dd></div>
+                            <div><dt>Teléfono móvil</dt><dd>{{ accountProfile.mobile || 'No registrado' }}</dd></div>
+                            <div><dt>Dirección</dt><dd>{{ accountProfile.address || 'No hay dirección registrada' }}</dd></div>
+                            <div><dt>Tarjeta Fringe Rewards</dt><dd>{{ maskedCardNumber }}</dd></div>
+                          </dl>
+                        </section>
+                        <section class="account-section">
+                          <div class="section-title-row"><h3>Movimientos recientes</h3><button class="text-action" type="button" (click)="navigateAccount('movimientos')">Ver todos</button></div>
+                          <div class="account-table-wrap">
+                            <table class="account-table">
+                              <thead><tr><th>Código</th><th>Establecimiento</th><th>Descripción</th><th>Fecha</th><th>Cargo</th><th>Abono</th><th>Saldo</th></tr></thead>
+                              <tbody>
+                                @for (movement of accountMovements.slice(0, 5); track movement.code) {
+                                  <tr><td>{{ movement.code }}</td><td>{{ movement.location }}</td><td>{{ movement.description }}</td><td>{{ movement.date }}</td><td>{{ movement.charge }}</td><td>{{ movement.credit }}</td><td>{{ movement.balance }}</td></tr>
+                                } @empty {
+                                  <tr><td class="empty-row" colspan="7">No hay movimientos disponibles.</td></tr>
+                                }
+                              </tbody>
+                            </table>
+                          </div>
+                        </section>
+                      }
+                      @case ('movimientos') {
+                        <section class="account-section" aria-label="Movimientos de la cuenta">
+                          <div class="movement-filters">
+                            <label>Desde <input #fromDate type="date" (input)="setMovementRange('from', fromDate.value)"></label>
+                            <label>Hasta <input #untilDate type="date" (input)="setMovementRange('until', untilDate.value)"></label>
+                            <button class="text-action" type="button" (click)="clearMovementRange(fromDate, untilDate)">Limpiar fechas</button>
+                          </div>
+                          <div class="account-table-wrap">
+                            <table class="account-table">
+                              <thead><tr><th>Código</th><th>Establecimiento</th><th>Descripción</th><th>Fecha</th><th>Cargo</th><th>Abono</th><th>Saldo</th></tr></thead>
+                              <tbody>
+                                @for (movement of pagedMovements; track movement.code) {
+                                  <tr><td>{{ movement.code }}</td><td>{{ movement.location }}</td><td>{{ movement.description }}</td><td>{{ movement.date }}</td><td>{{ movement.charge }}</td><td>{{ movement.credit }}</td><td>{{ movement.balance }}</td></tr>
+                                } @empty {
+                                  <tr><td class="empty-row" colspan="7">No hay movimientos en el período seleccionado.</td></tr>
+                                }
+                              </tbody>
+                            </table>
+                          </div>
+                          <div class="movement-pagination">
+                            <span>Mostrando {{ visibleMovements.length ? (movementPage - 1) * pageSize + 1 : 0 }}–{{ movementDisplayEnd }} de {{ visibleMovements.length }} movimientos</span>
+                            <nav aria-label="Paginación de movimientos">
+                              <button class="pager-button" type="button" aria-label="Página anterior" [disabled]="movementPage === 1" (click)="navigateMovementsPage(movementPage - 1)">
+                                <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M12.5 4.5 7 10l5.5 5.5" /></svg>
+                                <span>Anterior</span>
+                              </button>
+                              <span class="pager-status" aria-live="polite">Página <strong>{{ movementPage }}</strong> de {{ movementPageCount }}</span>
+                              <button class="pager-button" type="button" aria-label="Página siguiente" [disabled]="movementPage === movementPageCount" (click)="navigateMovementsPage(movementPage + 1)">
+                                <span>Siguiente</span>
+                                <svg viewBox="0 0 20 20" aria-hidden="true"><path d="m7.5 4.5 5.5 5.5-5.5 5.5" /></svg>
+                              </button>
+                            </nav>
+                          </div>
+                        </section>
+                      }
+                      @case ('password') {
+                        <section class="account-section account-form-section" aria-label="Cambiar contraseña">
+                          <form class="account-form" (submit)="$event.preventDefault(); notifyAccountSaveUnavailable()">
+                            <label>Contraseña anterior<input type="password" autocomplete="current-password" required></label>
+                            <label>Nueva contraseña<input type="password" autocomplete="new-password" required minlength="8"></label>
+                            <label>Confirmar contraseña<input type="password" autocomplete="new-password" required minlength="8"></label>
+                            <button class="submit" type="submit">Guardar contraseña</button>
+                          </form>
+                        </section>
+                      }
+                      @case ('datos') {
+                        <section class="account-section account-form-section" aria-label="Actualizar datos">
+                          <form class="account-form profile-form" (submit)="$event.preventDefault(); notifyAccountSaveUnavailable()">
+                            <label>Nombre<input type="text" autocomplete="given-name" [value]="accountProfile.firstName" required></label>
+                            <label>Apellido<input type="text" autocomplete="family-name" [value]="accountProfile.lastName" required></label>
+                            <label>Dirección<input type="text" autocomplete="street-address" [value]="accountProfile.address"></label>
+                            <label>Teléfono<input type="tel" autocomplete="tel" [value]="accountProfile.phone"></label>
+                            <label>Teléfono móvil<input type="tel" autocomplete="tel-national" [value]="accountProfile.mobile"></label>
+                            <label>Correo electrónico<input type="email" autocomplete="email" [value]="accountProfile.email" required></label>
+                            <button class="submit" type="submit">Guardar datos</button>
+                          </form>
+                        </section>
+                      }
+                      @case ('establecimientos') {
+                        <section class="account-section" aria-label="Establecimientos Fringe">
+                          <div class="account-locations">
+                            <article><img src="assets/img/sucursales/Ubicación-Z14.png" alt=""><div><h4>Fringe Zona 14</h4><p>21 calle 5-52, Zona 14<br>Ciudad de Guatemala</p><p>Lunes a viernes, 7:00 a.m. a 6:00 p.m.<br>Sábado, 7:00 a.m. a 5:00 p.m.</p></div></article>
+                            <article><img src="assets/img/sucursales/Ubicación-Carretera.png" alt=""><div><h4>Fringe Carretera</h4><p>km 14.5 Carretera a El Salvador, Santa Catarina Pinula</p><p>Lunes a viernes, 7:00 a.m. a 6:00 p.m.<br>Sábado, 7:00 a.m. a 5:00 p.m.</p></div></article>
+                          </div>
+                        </section>
+                      }
+                      @case ('premios') {
+                        <section class="account-section" aria-label="Premios y recompensas">
+                          @if (accountRewards.length) {
+                            <div class="account-rewards">
+                              @for (reward of accountRewards; track reward.name) {
+                                <article>
+                                  @if (reward.image) { <img [src]="reward.image" alt=""> }
+                                  <h4>{{ reward.name }}</h4>
+                                  <p>{{ reward.description }}</p>
+                                  <span>{{ reward.points }} puntos</span>
+                                  <button type="button" [disabled]="accountProfile.points < reward.points" (click)="notifyRewardRedemptionUnavailable()">Canjear</button>
+                                </article>
+                              }
+                            </div>
+                          } @else {
+                            <p class="account-empty">No hay premios disponibles en este momento.</p>
+                          }
+                        </section>
+                      }
+                    }
+                  </div>
+                </div>
+              }
             }
             @case ('contacto') {
               <div class="panel-heading"><h1>CONTÁCTANOS</h1></div>
@@ -208,6 +391,17 @@ type Section = 'inicio' | 'acerca' | 'beneficios' | 'politicas' | 'establecimien
   `,
 })
 export class AppComponent implements OnInit, OnDestroy {
+  readonly accountNavItems: { id: AccountPage; label: string }[] = [
+    { id: 'inicio', label: 'Inicio' },
+    { id: 'movimientos', label: 'Mis movimientos' },
+    { id: 'password', label: 'Cambiar contraseña' },
+    { id: 'datos', label: 'Actualizar datos' },
+    { id: 'establecimientos', label: 'Establecimientos' },
+    { id: 'premios', label: 'Premios' },
+  ];
+  accountMovements: AccountMovement[] = [];
+  accountRewards: AccountReward[] = [];
+  readonly pageSize = 5;
   readonly navItems: { id: Section; label: string }[] = [
     { id: 'inicio', label: 'INICIO' }, { id: 'acerca', label: 'ACERCA DE' },
     { id: 'beneficios', label: 'BENEFICIOS' }, { id: 'politicas', label: 'POLÍTICAS' },
@@ -221,8 +415,44 @@ export class AppComponent implements OnInit, OnDestroy {
   private readonly changeDetector = inject(ChangeDetectorRef);
   loginMessage = '';
   contactMessage = '';
+  accountProfile: AccountProfile | null = null;
+  accountPage: AccountPage = 'inicio';
+  accountMenuOpen = false;
+  accountNotice = '';
+  movementFrom = '';
+  movementUntil = '';
+  movementPage = 1;
   private controlsTimer: ReturnType<typeof setTimeout> | undefined;
   private slideTimer: ReturnType<typeof setInterval> | undefined;
+
+  get visibleMovements(): AccountMovement[] {
+    return this.accountMovements.filter((movement) =>
+      (!this.movementFrom || movement.date >= this.movementFrom) &&
+      (!this.movementUntil || movement.date <= this.movementUntil),
+    );
+  }
+
+  get pagedMovements(): AccountMovement[] {
+    const start = (this.movementPage - 1) * this.pageSize;
+    return this.visibleMovements.slice(start, start + this.pageSize);
+  }
+
+  get movementPageCount(): number {
+    return Math.max(1, Math.ceil(this.visibleMovements.length / this.pageSize));
+  }
+
+  get movementDisplayEnd(): number {
+    return Math.min(this.movementPage * this.pageSize, this.visibleMovements.length);
+  }
+
+  get accountPageLabel(): string {
+    return this.accountNavItems.find((item) => item.id === this.accountPage)?.label ?? 'Mi cuenta';
+  }
+
+  get maskedCardNumber(): string {
+    const digits = this.accountProfile?.cardNumber.replace(/\D/g, '') ?? '';
+    return digits ? `•••• •••• •••• ${digits.slice(-4)}` : 'No registrada';
+  }
 
   ngOnInit(): void {
     this.startSlideRotation();
@@ -237,6 +467,7 @@ export class AppComponent implements OnInit, OnDestroy {
     }
     this.loginMessage = '';
     this.contactMessage = '';
+    this.accountNotice = '';
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
@@ -287,6 +518,89 @@ export class AppComponent implements OnInit, OnDestroy {
 
   submitLogin(): void {
     this.loginMessage = 'El inicio de sesión requiere el servicio de autenticación del portal Fringe Rewards.';
+  }
+
+  onAuthenticationSuccess(profile: AccountProfile): void {
+    this.accountProfile = profile;
+    this.accountPage = 'inicio';
+    this.accountNotice = '';
+    this.loginMessage = '';
+    this.accountMenuOpen = false;
+    this.movementFrom = '';
+    this.movementUntil = '';
+    this.movementPage = 1;
+    this.section = 'cuenta';
+    this.stopSlideRotation();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  signOut(): void {
+    this.accountProfile = null;
+    this.accountMovements = [];
+    this.accountRewards = [];
+    this.accountMenuOpen = false;
+    this.accountNotice = '';
+    this.loginMessage = '';
+    this.movementFrom = '';
+    this.movementUntil = '';
+    this.movementPage = 1;
+    this.section = 'inicio';
+    this.startSlideRotation();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  updateAccountProfile(profile: AccountProfile): void {
+    this.accountProfile = profile;
+  }
+
+  updateAccountMovements(movements: AccountMovement[]): void {
+    this.accountMovements = movements;
+    this.movementPage = Math.min(this.movementPage, this.movementPageCount);
+  }
+
+  updateAccountRewards(rewards: AccountReward[]): void {
+    this.accountRewards = rewards;
+  }
+
+  navigateAccount(page: AccountPage): void {
+    this.accountPage = page;
+    this.accountMenuOpen = false;
+    this.accountNotice = '';
+    if (page === 'movimientos') this.movementPage = 1;
+  }
+
+  toggleAccountMenu(): void {
+    this.accountMenuOpen = !this.accountMenuOpen;
+  }
+
+  closeAccountMenu(): void {
+    this.accountMenuOpen = false;
+  }
+
+  setMovementRange(range: 'from' | 'until', value: string): void {
+    if (range === 'from') this.movementFrom = value;
+    else this.movementUntil = value;
+    this.movementPage = 1;
+  }
+
+  clearMovementRange(fromDate: HTMLInputElement, untilDate: HTMLInputElement): void {
+    this.movementFrom = '';
+    this.movementUntil = '';
+    this.movementPage = 1;
+    fromDate.value = '';
+    untilDate.value = '';
+  }
+
+  navigateMovementsPage(page: number): void {
+    this.movementPage = Math.min(Math.max(1, page), this.movementPageCount);
+  }
+
+  notifyAccountSaveUnavailable(): void {
+    this.accountNotice = 'El servicio para guardar cambios aún no está disponible.';
+  }
+
+  notifyRewardRedemptionUnavailable(): void {
+    this.accountNotice = 'El servicio para canjear premios aún no está disponible.';
   }
 
   submitContact(): void {

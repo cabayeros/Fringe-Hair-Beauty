@@ -24,3 +24,5 @@ Publica el contenido de `dist/fringe/browser`. El build usa rutas relativas para
 ## Contenido
 
 Se conservaron las imágenes, logos, tipografías e icono incluidos en la copia disponible y se recuperaron de la página activa los textos e imágenes de Acerca de, Beneficios, Políticas, Establecimientos y Contáctanos. El inicio de sesión y el envío del formulario de contacto necesitan servicios externos; las rutas PHP originales no se incluyeron.
+
+La sección Mi Cuenta incluye las vistas autenticadas de resumen, movimientos, cambio de contraseña, actualización de datos, establecimientos y premios. Al conectar autenticación, el servicio debe invocar `onAuthenticationSuccess` con el perfil y cargar los movimientos y premios mediante `updateAccountMovements` y `updateAccountRewards`; hasta entonces, la sección conserva el formulario de inicio de sesión.
