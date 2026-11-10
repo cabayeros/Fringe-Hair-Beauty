@@ -164,13 +164,15 @@ type Section = 'inicio' | 'acerca' | 'beneficios' | 'politicas' | 'establecimien
             @case ('cuenta') {
               <div class="panel-heading"><h1>MI CUENTA</h1></div>
               <form class="login-form" (submit)="$event.preventDefault(); submitLogin()">
+                <h2>Inicia sesión</h2>
+                <p>Accede a tus puntos y beneficios de Fringe Rewards.</p>
                 <label class="sr-only" for="username">Nombre de Usuario</label>
                 <input id="username" name="c1" autocomplete="username" placeholder="Nombre de Usuario" required maxlength="48">
                 <label class="sr-only" for="password">Contraseña</label>
                 <input id="password" name="c2" type="password" autocomplete="current-password" placeholder="Contraseña" required maxlength="17">
                 <label class="remember"><input type="checkbox" name="remember"> Recordar contraseña</label>
                 <button class="submit" type="submit">Enviar</button>
-                @if (loginMessage) { <p class="form-message">{{ loginMessage }}</p> }
+                @if (loginMessage) { <p class="form-message" role="status">{{ loginMessage }}</p> }
               </form>
             }
             @case ('contacto') {
